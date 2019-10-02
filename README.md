@@ -6,3 +6,4 @@ Tutorials:
 
 - https://www.techiediaries.com/node-sqlite-crud/
 - https://dev.to/lampewebdev/getting-sqlite-running-with-await-async-and-expressjs-polkajs-2b0g
+- https://stackoverflow.com/questions/53084827/sqlite-foreign-key-constraint-not-being-triggered-from-nodejs-javascript
