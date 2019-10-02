@@ -1,0 +1,24 @@
+{
+  "name": "Reservation-System",
+  "version": "1.0.0",
+  "description": "A reservation system for the sales division",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RaresDobre98/Reservation-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RaresDobre98/Reservation-System/issues"
+  },
+  "homepage": "https://github.com/RaresDobre98/Reservation-System#readme",
+  "dependencies": {
+    "sqlite3": "^4.1.0"
+  }
+}

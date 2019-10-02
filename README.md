@@ -1,3 +1,5 @@
 # Reservation-System
 A reservation system for the sales division
-Test commit
+
+Tutorials:
+	- https://www.techiediaries.com/node-sqlite-crud/
