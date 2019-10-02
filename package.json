@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/RaresDobre98/Reservation-System#readme",
   "dependencies": {
-    "sqlite3": "^4.1.0"
+    "sqlite-async": "^1.0.12"
   }
 }
