@@ -127,6 +127,60 @@ const startExpressServer = () => {
 
   // Insert here other API endpoints
 
+  // GET all resources
+  app.get("/api/resources", async (req, res, next) => {
+    console.log("[REQUESTS] A request has been made on /api/resources");
+    let sql = "SELECT * FROM resources";
+    let rows;
+    try {
+      rows = await db.all(sql);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+    res.json({
+      message: "success",
+      data: rows
+    });
+  });
+
+  // GET all reservations
+  app.get("/api/reservations", async (req, res, next) => {
+    console.log("[REQUESTS] A request has been made on /api/reservations");
+    let sql = "SELECT * FROM reservations";
+    let rows;
+    try {
+      rows = await db.all(sql);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+    res.json({
+      message: "success",
+      data: rows
+    });
+  });
+
+  // GET a single resource
+  app.get("/api/resource/:id", async (req, res, next) => {
+    console.log(
+      "[REQUESTS] A request has been made on /api/resources/" + req.params.id
+    );
+    let sql = "SELECT * FROM resources WHERE resource_id = ?";
+    let params = [req.params.id];
+    try {
+      let row = await db.get(sql, params);
+      if (row) {
+        res.json({
+          message: "success",
+          data: row
+        });
+      } else {
+        res.status(400).json({ error: "Invalid resource id" });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Default response for any other request
   app.get("*", function(req, res) {
     res.status(404).json({ error: "Page not found" });
