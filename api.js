@@ -45,6 +45,13 @@ const main = (async () => {
       "email3@gmail.com",
       "booo"
     );
+    await insertReservation(
+      new Date(),
+      new Date(),
+      "3",
+      "email4@gmail.com",
+      "go go go"
+    );
 
     await printReservations();
 
@@ -116,6 +123,11 @@ const printReservations = async () => {
 };
 
 const startExpressServer = () => {
+  // Parse the body of POST requests
+  const bodyParser = require("body-parser");
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
+
   // Start server
   app.listen(HTTP_PORT, () => {
     console.log("Server running on port " + HTTP_PORT);
@@ -126,10 +138,9 @@ const startExpressServer = () => {
   });
 
   // Insert here other API endpoints
-
   // GET all resources
   app.get("/api/resources", async (req, res, next) => {
-    console.log("[REQUESTS] A request has been made on /api/resources");
+    console.log("[GET] A request has been made on /api/resources");
     let sql = "SELECT * FROM resources";
     let rows;
     try {
@@ -145,7 +156,7 @@ const startExpressServer = () => {
 
   // GET all reservations
   app.get("/api/reservations", async (req, res, next) => {
-    console.log("[REQUESTS] A request has been made on /api/reservations");
+    console.log("[GET] A request has been made on /api/reservations");
     let sql = "SELECT * FROM reservations";
     let rows;
     try {
@@ -162,7 +173,7 @@ const startExpressServer = () => {
   // GET a single resource
   app.get("/api/resource/:id", async (req, res, next) => {
     console.log(
-      "[REQUESTS] A request has been made on /api/resources/" + req.params.id
+      "[GET] A request has been made on /api/resources/" + req.params.id
     );
     let sql = "SELECT * FROM resources WHERE resource_id = ?";
     let params = [req.params.id];
@@ -178,6 +189,59 @@ const startExpressServer = () => {
       }
     } catch (err) {
       res.status(500).json({ error: err.message });
+    }
+  });
+
+  // GET a single reservation
+  app.get("/api/reservation/:id", async (req, res, next) => {
+    console.log(
+      "[GET] A request has been made on /api/reservation/" + req.params.id
+    );
+    let sql = "SELECT * FROM reservations WHERE reservation_id = ?";
+    let params = [req.params.id];
+    try {
+      let row = await db.get(sql, params);
+      if (row) {
+        res.json({
+          message: "success",
+          data: row
+        });
+      } else {
+        res.status(400).json({ error: "Invalid reservation id" });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // POST (insert) a new resource
+  app.post("/api/resource/", async (req, res, next) => {
+    console.log(
+      "[POST] A request has been made on /api/resource/ with the following object " +
+        JSON.stringify(req.body)
+    );
+    let errors = [];
+    if (!req.body.resource_name) {
+      errors.push("No resource_name specified");
+    }
+    if (errors.length) {
+      res.status(400).json({ error: errors.join(",") });
+      return;
+    }
+    let data = {
+      resource_name: req.body.resource_name
+    };
+    let sql = "INSERT INTO resources (resource_name) VALUES (?)";
+    let params = data.resource_name;
+    try {
+      let { lastID } = await db.run(sql, params);
+      res.json({
+        message: "success",
+        data: data,
+        id: lastID
+      });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
     }
   });
 

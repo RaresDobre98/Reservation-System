@@ -9,3 +9,4 @@ Tutorials used:
 - https://stackoverflow.com/questions/53084827/sqlite-foreign-key-constraint-not-being-triggered-from-nodejs-javascript
 - https://developerhowto.com/2018/12/29/build-a-rest-api-with-node-js-and-express-js/
 - https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc?hl=ro
+- https://dl.pstmn.io/download/latest/win64
