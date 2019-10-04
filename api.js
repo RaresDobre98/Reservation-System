@@ -1,8 +1,16 @@
 const Database = require("sqlite-async");
+const express = require("express");
+const app = express();
 
-const main = async () => {
+// Server port
+const HTTP_PORT = 8000;
+
+let db;
+
+const main = (async () => {
   try {
     db = await Database.open(":memory:");
+    // db = await Database.open("./mydb.sqlite3");
   } catch (e) {
     throw Error("can not access sqlite database");
   }
@@ -38,11 +46,13 @@ const main = async () => {
       "booo"
     );
 
-    printReservations();
+    await printReservations();
+
+    startExpressServer();
   } catch (e) {
     console.error(e);
   }
-};
+})();
 
 const createTables = async () => {
   console.log("[CREATE] Creating resources table");
@@ -80,7 +90,7 @@ const insertReservation = async (
 const printResources = async () => {
   console.log("[SELECT] Printing resources data");
   let rows = await db.all("SELECT * FROM resources");
-  await rows.forEach(row =>
+  return await rows.forEach(row =>
     console.log(row.resource_id + ": " + row.resource_name)
   );
 };
@@ -88,7 +98,7 @@ const printResources = async () => {
 const printReservations = async () => {
   console.log("[SELECT] Printing reservations data");
   let rows = await db.all("SELECT * FROM reservations");
-  await rows.forEach(row =>
+  return await rows.forEach(row =>
     console.log(
       row.reservation_id +
         ": " +
@@ -105,4 +115,20 @@ const printReservations = async () => {
   );
 };
 
-main();
+const startExpressServer = () => {
+  // Start server
+  app.listen(HTTP_PORT, () => {
+    console.log("Server running on port " + HTTP_PORT);
+  });
+  // Root endpoint
+  app.get("/test", (req, res, next) => {
+    res.json({ message: "Ok" });
+  });
+
+  // Insert here other API endpoints
+
+  // Default response for any other request
+  app.get("*", function(req, res) {
+    res.status(404).json({ error: "Page not found" });
+  });
+};
