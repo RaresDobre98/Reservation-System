@@ -5,6 +5,11 @@ const app = express();
 // Server port
 const HTTP_PORT = 8000;
 
+// Regex email
+const validateEmail = email =>
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+    String(email).toLowerCase()
+  );
 let db;
 
 const main = (async () => {
@@ -225,7 +230,7 @@ const startExpressServer = () => {
       errors.push("No resource_name specified");
     }
     if (errors.length) {
-      res.status(400).json({ error: errors.join(",") });
+      res.status(400).json({ error: errors.join(", ") });
       return;
     }
     let data = {
@@ -233,6 +238,66 @@ const startExpressServer = () => {
     };
     let sql = "INSERT INTO resources (resource_name) VALUES (?)";
     let params = data.resource_name;
+    try {
+      let { lastID } = await db.run(sql, params);
+      res.json({
+        message: "success",
+        data: data,
+        id: lastID
+      });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // POST (insert) a new reservation
+  app.post("/api/reservation/", async (req, res, next) => {
+    console.log(
+      "[POST] A request has been made on /api/reservation/ with the following object " +
+        JSON.stringify(req.body)
+    );
+    let errors = [];
+    if (!req.body.start_date) {
+      errors.push("No start_date specified");
+    }
+    if (!req.body.end_date) {
+      errors.push("No end_date specified");
+    }
+    if (!req.body.resource_id) {
+      errors.push("No resource_id specified");
+    }
+    if (!req.body.owner_email) {
+      errors.push("No owner_email specified");
+    }
+    if (!req.body.comments) {
+      errors.push("No comments specified");
+    }
+    if (req.body.start_date > req.body.end_date) {
+      errors.push("start_date should be before end_date");
+    }
+    if (!validateEmail(req.body.owner_email)) {
+      errors.push("Invalid e-mail format");
+    }
+    if (errors.length) {
+      res.status(400).json({ error: errors.join(", ") });
+      return;
+    }
+    let data = {
+      start_date: req.body.start_date,
+      end_date: req.body.end_date,
+      resource_id: req.body.resource_id,
+      owner_email: req.body.owner_email,
+      comments: req.body.comments
+    };
+    let sql =
+      "INSERT INTO reservations (start_date, end_date, resource_id, owner_email, comments) VALUES (?,?,?,?,?)";
+    let params = [
+      data.start_date,
+      data.end_date,
+      data.resource_id,
+      data.owner_email,
+      data.comments
+    ];
     try {
       let { lastID } = await db.run(sql, params);
       res.json({
