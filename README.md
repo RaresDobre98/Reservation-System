@@ -11,3 +11,4 @@ Tutorials used:
 - https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc?hl=ro
 - https://dl.pstmn.io/download/latest/win64
 - https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
+- https://www.youtube.com/watch?v=9CPmtIeapMw
