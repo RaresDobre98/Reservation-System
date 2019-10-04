@@ -26,6 +26,7 @@ const main = (async () => {
     await insertResource("First resouce name");
     await insertResource("Second resouce name");
     await insertResource("Third resouce name");
+    await insertResource("4th resouce name");
 
     await printResources();
 
@@ -318,14 +319,6 @@ const startExpressServer = () => {
         " with the following object " +
         JSON.stringify(req.body)
     );
-    // let errors = [];
-    // if (!req.body.resource_name) {
-    //   errors.push("No resource_name specified");
-    // }
-    // if (errors.length) {
-    //   res.status(400).json({ error: errors.join(", ") });
-    //   return;
-    // }
     let data = {
       resource_name: req.body.resource_name
     };
@@ -384,6 +377,46 @@ const startExpressServer = () => {
         data: data,
         changes: changes
       });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // DELETE a resource
+  app.delete("/api/resource/:id", async (req, res, next) => {
+    console.log(
+      "[DELETE] A request has been made on /api/resource/" + req.params.id
+    );
+    try {
+      let { changes } = await db.run(
+        "DELETE FROM resources WHERE resource_id = ?",
+        req.params.id
+      );
+      if (changes === 0) {
+        res.json({ error: "Nothing was deleted" });
+      } else {
+        res.json({ message: "deleted", changes: changes });
+      }
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // DELETE a reservation
+  app.delete("/api/reservation/:id", async (req, res, next) => {
+    console.log(
+      "[DELETE] A request has been made on /api/reservation/" + req.params.id
+    );
+    try {
+      let { changes } = await db.run(
+        "DELETE FROM reservations WHERE reservation_id = ?",
+        req.params.id
+      );
+      if (changes === 0) {
+        res.json({ error: "Nothing was deleted" });
+      } else {
+        res.json({ message: "deleted", changes: changes });
+      }
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
