@@ -7,7 +7,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  FormGroup,
   Label,
   Input,
   Form
@@ -30,7 +29,25 @@ class App extends Component {
     newResourceModal: false,
     editResourceModal: false,
     errorMessage: "No error ;)",
-    errorMessageModal: false
+    errorMessageModal: false,
+    reservations: [],
+    newReservationData: {
+      start_date: "",
+      end_date: "",
+      resource_id: "",
+      owner_email: "",
+      comments: ""
+    },
+    editReservationData: {
+      reservation_id: "",
+      start_date: "",
+      end_date: "",
+      resource_id: "",
+      owner_email: "",
+      comments: ""
+    },
+    newReservationModal: false,
+    editReservationModal: false
   };
 
   notify = () =>
@@ -56,6 +73,13 @@ class App extends Component {
   toggleNewResourceModal() {
     this.setState({
       newResourceModal: !this.state.newResourceModal,
+      errorMessageModal: false
+    });
+  }
+
+  toggleNewReservationModal() {
+    this.setState({
+      newReservationModal: !this.state.newReservationModal,
       errorMessageModal: false
     });
   }
@@ -111,8 +135,9 @@ class App extends Component {
     this.toggleEditResourceModal();
   }
 
-  updateResource() {
+  updateResource(e) {
     // console.log("here");
+    e.preventDefault();
     console.log(this.state.editResourceData);
     let { resource_id, resource_name } = this.state.editResourceData;
     axios
@@ -237,11 +262,11 @@ class App extends Component {
           isOpen={this.state.editResourceModal}
           toggle={this.toggleEditResourceModal.bind(this)}
         >
-          <ModalHeader toggle={this.toggleEditResourceModal.bind(this)}>
-            Edit Resource
-          </ModalHeader>
-          <ModalBody>
-            <FormGroup>
+          <Form onSubmit={this.updateResource.bind(this)}>
+            <ModalHeader toggle={this.toggleEditResourceModal.bind(this)}>
+              Edit Resource
+            </ModalHeader>
+            <ModalBody>
               <Label for="resource_name">Resource Name</Label>
               <Input
                 id="resource_name"
@@ -261,19 +286,17 @@ class App extends Component {
               >
                 {this.state.errorMessage}
               </Alert>
-            </FormGroup>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={this.updateResource.bind(this)}>
-              Update Resource
-            </Button>{" "}
-            <Button
-              color="secondary"
-              onClick={this.toggleEditResourceModal.bind(this)}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary">Update Resource</Button>{" "}
+              <Button
+                color="secondary"
+                onClick={this.toggleEditResourceModal.bind(this)}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Form>
         </Modal>
         <Table>
           <thead>
