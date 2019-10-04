@@ -310,6 +310,85 @@ const startExpressServer = () => {
     }
   });
 
+  // PATCH (update) a resource
+  app.patch("/api/resource/:id", async (req, res, next) => {
+    console.log(
+      "[PATCH] A request has been made on /api/resource/" +
+        req.params.id +
+        " with the following object " +
+        JSON.stringify(req.body)
+    );
+    // let errors = [];
+    // if (!req.body.resource_name) {
+    //   errors.push("No resource_name specified");
+    // }
+    // if (errors.length) {
+    //   res.status(400).json({ error: errors.join(", ") });
+    //   return;
+    // }
+    let data = {
+      resource_name: req.body.resource_name
+    };
+    let params = [data.resource_name, req.params.id];
+    try {
+      let { changes } = await db.run(
+        "UPDATE resources SET resource_name = COALESCE(?, resource_name) WHERE resource_id = ?",
+        params
+      );
+      res.json({
+        message: "success",
+        data: data,
+        changes: changes
+      });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // PATCH (update) a reservation
+  app.patch("/api/reservation/:id", async (req, res, next) => {
+    console.log(
+      "[PATCH] A request has been made on /api/reservation/" +
+        req.params.id +
+        " with the following object " +
+        JSON.stringify(req.body)
+    );
+    let data = {
+      start_date: req.body.start_date,
+      end_date: req.body.end_date,
+      resource_id: req.body.resource_id,
+      owner_email: req.body.owner_email,
+      comments: req.body.comments
+    };
+    let params = [
+      data.start_date,
+      data.end_date,
+      data.resource_id,
+      data.owner_email,
+      data.comments,
+      req.params.id
+    ];
+    try {
+      if (!validateEmail(req.body.owner_email)) {
+        throw new Error("Invalid e-mail format");
+      }
+      if (req.body.start_date > req.body.end_date) {
+        throw new Error("start_date should be before end_date");
+      }
+      let { changes } = await db.run(
+        "UPDATE reservations SET start_date = COALESCE(?, start_date), end_date = COALESCE(?, end_date), resource_id = COALESCE(?, resource_id), owner_email = COALESCE(?, owner_email), comments = COALESCE(?, comments) WHERE reservation_id = ?",
+        params
+      );
+      res.json({
+        message: "success",
+        data: data,
+        changes: changes
+      });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
   // Default response for any other request
   app.get("*", function(req, res) {
     res.status(404).json({ error: "Page not found" });
