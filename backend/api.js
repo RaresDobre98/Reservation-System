@@ -1,6 +1,8 @@
 const Database = require("sqlite-async");
 const express = require("express");
+const cors = require("cors");
 const app = express();
+app.use(cors());
 
 // Server port
 const HTTP_PORT = 8000;
@@ -319,6 +321,14 @@ const startExpressServer = () => {
         " with the following object " +
         JSON.stringify(req.body)
     );
+    let errors = [];
+    if (req.body.resource_name === "") {
+      errors.push("Resource_name should not be null");
+    }
+    if (errors.length) {
+      res.status(400).json({ error: errors.join(", ") });
+      return;
+    }
     let data = {
       resource_name: req.body.resource_name
     };
