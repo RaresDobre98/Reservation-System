@@ -9,7 +9,8 @@ import {
   ModalFooter,
   FormGroup,
   Label,
-  Input
+  Input,
+  Form
 } from "reactstrap";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -66,7 +67,8 @@ class App extends Component {
     });
   }
 
-  addResource() {
+  addResource(e) {
+    e.preventDefault();
     axios
       .post("http://localhost:8000/api/resource", this.state.newResourceData)
       .then(res => {
@@ -184,16 +186,17 @@ class App extends Component {
         >
           Add a new Resource
         </Button>
+
         <Modal
           style={{ opacity: 1 }}
           isOpen={this.state.newResourceModal}
           toggle={this.toggleNewResourceModal.bind(this)}
         >
-          <ModalHeader toggle={this.toggleNewResourceModal.bind(this)}>
-            Add a new Resource
-          </ModalHeader>
-          <ModalBody>
-            <FormGroup>
+          <Form onSubmit={this.addResource.bind(this)}>
+            <ModalHeader toggle={this.toggleNewResourceModal.bind(this)}>
+              Add a new Resource
+            </ModalHeader>
+            <ModalBody>
               <Label for="resource_name">Resource Name</Label>
               <Input
                 id="resource_name"
@@ -214,20 +217,21 @@ class App extends Component {
               >
                 {this.state.errorMessage}
               </Alert>
-            </FormGroup>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={this.addResource.bind(this)}>
-              Add Resource
-            </Button>{" "}
-            <Button
-              color="secondary"
-              onClick={this.toggleNewResourceModal.bind(this)}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
+            </ModalBody>
+            <ModalFooter>
+              <Button type="submit" color="primary">
+                Add Resource
+              </Button>{" "}
+              <Button
+                color="secondary"
+                onClick={this.toggleNewResourceModal.bind(this)}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Form>
         </Modal>
+
         <Modal
           style={{ opacity: 1 }}
           isOpen={this.state.editResourceModal}
