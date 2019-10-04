@@ -11,7 +11,10 @@ import {
   Label,
   Input
 } from "reactstrap";
+import { toast } from "react-toastify";
 import axios from "axios";
+import "react-toastify/dist/ReactToastify.css";
+toast.configure({ autoClose: 4000, draggable: true });
 
 class App extends Component {
   state = {
@@ -28,6 +31,16 @@ class App extends Component {
     errorMessage: "No error ;)",
     errorMessageModal: false
   };
+
+  notify = () =>
+    toast(
+      "This resource cannot be deleted, there are still some reservations made!",
+      {
+        className: "black-background",
+        bodyClassName: "grow-font-size",
+        progressClassName: "fancy-progress-bar"
+      }
+    );
 
   UNSAFE_componentWillMount() {
     this._refreshResources();
@@ -74,6 +87,15 @@ class App extends Component {
           errorMessageModal: true
         })
       );
+  }
+
+  deleteResource(resource_id) {
+    axios
+      .delete("http://localhost:8000/api/resource/" + resource_id)
+      .then(() => this._refreshResources())
+      .catch(() => {
+        this.notify();
+      });
   }
 
   editResource(resource_id, resource_name) {
@@ -140,7 +162,11 @@ class App extends Component {
             >
               Edit
             </Button>
-            <Button color="danger" size="sm">
+            <Button
+              color="danger"
+              size="sm"
+              onClick={this.deleteResource.bind(this, resource.resource_id)}
+            >
               Delete
             </Button>
           </td>
@@ -151,7 +177,6 @@ class App extends Component {
     return (
       <div className="App container">
         <h1>Reservation System</h1>
-
         <Button
           className="my-3"
           color="primary"
@@ -203,7 +228,6 @@ class App extends Component {
             </Button>
           </ModalFooter>
         </Modal>
-
         <Modal
           style={{ opacity: 1 }}
           isOpen={this.state.editResourceModal}
@@ -247,7 +271,6 @@ class App extends Component {
             </Button>
           </ModalFooter>
         </Modal>
-
         <Table>
           <thead>
             <tr>
