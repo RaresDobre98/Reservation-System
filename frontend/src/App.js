@@ -91,6 +91,44 @@ class App extends Component {
     });
   }
 
+  toggleEditReservationModal() {
+    this.setState({
+      editReservationModal: !this.state.editReservationModal,
+      errorMessageModal: false
+    });
+  }
+
+  addReservation(e) {
+    e.preventDefault();
+    axios
+      .post(
+        "http://localhost:8000/api/reservation",
+        this.state.newReservationData
+      )
+      .then(res => {
+        //console.log(res.data);
+        let { reservations } = this.state;
+        reservations.push({ ...res.data.data, reservation_id: res.data.id });
+        this.setState({
+          reservations,
+          newReservationModal: false,
+          newReservationData: {
+            start_date: "",
+            end_date: "",
+            resource_id: "",
+            owner_email: "",
+            comments: ""
+          }
+        });
+      })
+      .catch(err =>
+        this.setState({
+          errorMessage: err.response.data.error,
+          errorMessageModal: true
+        })
+      );
+  }
+
   addResource(e) {
     e.preventDefault();
     axios
@@ -115,6 +153,15 @@ class App extends Component {
       );
   }
 
+  deleteReservation(reservation_id) {
+    axios
+      .delete("http://localhost:8000/api/reservation/" + reservation_id)
+      .then(() => this._refreshResources())
+      .catch(() => {
+        //this.notify();
+      });
+  }
+
   deleteResource(resource_id) {
     axios
       .delete("http://localhost:8000/api/resource/" + resource_id)
@@ -122,6 +169,37 @@ class App extends Component {
       .catch(() => {
         this.notify();
       });
+  }
+
+  editReservation(
+    reservation_id,
+    start_date,
+    end_date,
+    resource_id,
+    owner_email,
+    comments
+  ) {
+    //console.log(resource_id, resource_name);
+    console.log(
+      "DA: " +
+        reservation_id +
+        start_date +
+        end_date +
+        resource_id +
+        owner_email +
+        comments
+    );
+    this.setState({
+      editReservationData: {
+        reservation_id,
+        start_date,
+        end_date,
+        resource_id,
+        owner_email,
+        comments
+      }
+    });
+    this.toggleEditReservationModal();
   }
 
   editResource(resource_id, resource_name) {
@@ -133,6 +211,51 @@ class App extends Component {
       }
     });
     this.toggleEditResourceModal();
+  }
+
+  updateReservation(e) {
+    // console.log("here");
+    e.preventDefault();
+    console.log("HERE" + this.state.editReservationData);
+    let {
+      reservation_id,
+      start_date,
+      end_date,
+      resource_id,
+      owner_email,
+      comments
+    } = this.state.editReservationData;
+    axios
+      .patch("http://localhost:8000/api/reservation/" + reservation_id, {
+        start_date,
+        end_date,
+        resource_id,
+        owner_email,
+        comments
+      })
+      .then(res => {
+        console.log(res);
+        this._refreshResources();
+
+        this.setState({
+          editReservationModal: false,
+          editReservationData: {
+            reservation_id: "",
+            start_date: "",
+            end_date: "",
+            resource_id: "",
+            owner_email: "",
+            comments: ""
+          }
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({
+          errorMessage: err.response.data.error,
+          errorMessageModal: true
+        });
+      });
   }
 
   updateResource(e) {
@@ -168,6 +291,11 @@ class App extends Component {
         resources: res.data.data
       });
     });
+    axios.get("http://localhost:8000/api/reservations").then(res => {
+      this.setState({
+        reservations: res.data.data
+      });
+    });
   }
 
   render() {
@@ -201,6 +329,47 @@ class App extends Component {
       );
     });
 
+    let reservations = this.state.reservations.map(reservation => {
+      return (
+        <tr key={reservation.reservation_id}>
+          <td>{reservation.reservation_id}</td>
+          <td>{reservation.start_date}</td>
+          <td>{reservation.end_date}</td>
+          <td>{reservation.resource_id}</td>
+          <td>{reservation.owner_email}</td>
+          <td>{reservation.comments}</td>
+          <td>
+            <Button
+              color="success"
+              size="sm"
+              className="mr-2"
+              onClick={this.editReservation.bind(
+                this,
+                reservation.reservation_id,
+                reservation.start_date,
+                reservation.end_date,
+                reservation.resource_id,
+                reservation.owner_email,
+                reservation.comments
+              )}
+            >
+              Edit
+            </Button>
+            <Button
+              color="danger"
+              size="sm"
+              onClick={this.deleteReservation.bind(
+                this,
+                reservation.reservation_id
+              )}
+            >
+              Delete
+            </Button>
+          </td>
+        </tr>
+      );
+    });
+
     return (
       <div className="App container">
         <h1>Reservation System</h1>
@@ -211,7 +380,6 @@ class App extends Component {
         >
           Add a new Resource
         </Button>
-
         <Modal
           style={{ opacity: 1 }}
           isOpen={this.state.newResourceModal}
@@ -256,7 +424,6 @@ class App extends Component {
             </ModalFooter>
           </Form>
         </Modal>
-
         <Modal
           style={{ opacity: 1 }}
           isOpen={this.state.editResourceModal}
@@ -308,6 +475,215 @@ class App extends Component {
           </thead>
 
           <tbody>{resources}</tbody>
+        </Table>
+        /*
+        REZEEEEEEEEEEEEEEEEEEERRRRRRRRRRRRRVAAAAAAAAAAAAAAAAAAAAAAAAAARIIIIIIIIIIIIIIII
+        */ <br></br>
+        <Button
+          className="my-3"
+          color="primary"
+          onClick={this.toggleNewReservationModal.bind(this)}
+        >
+          Add a new Reservation
+        </Button>
+        <Modal
+          style={{ opacity: 1 }}
+          isOpen={this.state.newReservationModal}
+          toggle={this.toggleNewReservationModal.bind(this)}
+        >
+          <Form onSubmit={this.addReservation.bind(this)}>
+            <ModalHeader toggle={this.toggleNewReservationModal.bind(this)}>
+              Add a new Reservation
+            </ModalHeader>
+            <ModalBody>
+              <Label for="start_date">Start Date</Label>
+              <Input
+                id="start_date"
+                value={this.state.newReservationData.start_date}
+                onChange={e => {
+                  let { newReservationData } = this.state;
+
+                  newReservationData.start_date = e.target.value;
+
+                  this.setState({ newReservationData });
+                }}
+                placeholder="insert start date here"
+              />
+              <Label for="start_date">End Date</Label>
+              <Input
+                id="end_date"
+                value={this.state.newReservationData.end_date}
+                onChange={e => {
+                  let { newReservationData } = this.state;
+
+                  newReservationData.end_date = e.target.value;
+
+                  this.setState({ newReservationData });
+                }}
+                placeholder="insert end date here"
+              />
+              <Label for="resource_id">Resource id</Label>
+              <Input
+                id="resource_id"
+                value={this.state.newReservationData.resource_id}
+                onChange={e => {
+                  let { newReservationData } = this.state;
+
+                  newReservationData.resource_id = e.target.value;
+
+                  this.setState({ newReservationData });
+                }}
+                placeholder="insert resource id here"
+              />
+              <Label for="owner_email">Owner email</Label>
+              <Input
+                id="owner_email"
+                value={this.state.newReservationData.owner_email}
+                onChange={e => {
+                  let { newReservationData } = this.state;
+
+                  newReservationData.owner_email = e.target.value;
+
+                  this.setState({ newReservationData });
+                }}
+                placeholder="insert owner email here"
+              />
+              <Label for="comments">Comments</Label>
+              <Input
+                id="comments"
+                value={this.state.newReservationData.comments}
+                onChange={e => {
+                  let { newReservationData } = this.state;
+
+                  newReservationData.comments = e.target.value;
+
+                  this.setState({ newReservationData });
+                }}
+                placeholder="insert comments here"
+              />
+              <Alert
+                className="my-1"
+                color="danger"
+                isOpen={this.state.errorMessageModal}
+              >
+                {this.state.errorMessage}
+              </Alert>
+            </ModalBody>
+            <ModalFooter>
+              <Button type="submit" color="primary">
+                Add Reservation
+              </Button>{" "}
+              <Button
+                color="secondary"
+                onClick={this.toggleNewReservationModal.bind(this)}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Form>
+        </Modal>
+        <Modal
+          style={{ opacity: 1 }}
+          isOpen={this.state.editReservationModal}
+          toggle={this.toggleEditReservationModal.bind(this)}
+        >
+          <Form onSubmit={this.updateReservation.bind(this)}>
+            <ModalHeader toggle={this.toggleEditReservationModal.bind(this)}>
+              Edit Reservation
+            </ModalHeader>
+            <ModalBody>
+              <Label for="start_date">Start Date</Label>
+              <Input
+                id="start_date"
+                value={this.state.editReservationData.start_date}
+                onChange={e => {
+                  let { editReservationData } = this.state;
+
+                  editReservationData.start_date = e.target.value;
+
+                  this.setState({ editReservationData });
+                }}
+              />
+              <Label for="end_date">End Date</Label>
+              <Input
+                id="end_date"
+                value={this.state.editReservationData.end_date}
+                onChange={e => {
+                  let { editReservationData } = this.state;
+
+                  editReservationData.end_date = e.target.value;
+
+                  this.setState({ editReservationData });
+                }}
+              />
+              <Label for="resource_id">Resource id</Label>
+              <Input
+                id="resource_id"
+                value={this.state.editReservationData.resource_id}
+                onChange={e => {
+                  let { editReservationData } = this.state;
+
+                  editReservationData.resource_id = e.target.value;
+
+                  this.setState({ editReservationData });
+                }}
+              />
+              <Label for="owner_email">Owner email</Label>
+              <Input
+                id="owner_email"
+                value={this.state.editReservationData.owner_email}
+                onChange={e => {
+                  let { editReservationData } = this.state;
+
+                  editReservationData.owner_email = e.target.value;
+
+                  this.setState({ editReservationData });
+                }}
+              />
+              <Label for="comments">Comments</Label>
+              <Input
+                id="comments"
+                value={this.state.editReservationData.comments}
+                onChange={e => {
+                  let { editReservationData } = this.state;
+
+                  editReservationData.comments = e.target.value;
+
+                  this.setState({ editReservationData });
+                }}
+              />
+              <Alert
+                className="my-1"
+                color="danger"
+                isOpen={this.state.errorMessageModal}
+              >
+                {this.state.errorMessage}
+              </Alert>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary">Update Reservation</Button>{" "}
+              <Button
+                color="secondary"
+                onClick={this.toggleEditReservationModal.bind(this)}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Form>
+        </Modal>
+        <Table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Start date</th>
+              <th>End date</th>
+              <th>Res id</th>
+              <th>Owner email</th>
+              <th>Comments</th>
+            </tr>
+          </thead>
+
+          <tbody>{reservations}</tbody>
         </Table>
       </div>
     );
