@@ -51,12 +51,13 @@ class App extends Component {
   };
 
   notify = () =>
-    toast(
+    toast.error(
       "This resource cannot be deleted, there are still some reservations made!",
       {
-        className: "black-background",
-        bodyClassName: "grow-font-size",
-        progressClassName: "fancy-progress-bar"
+        // position: toast.POSITION.BOTTOM_CENTER,
+        // className: "black-background",
+        // bodyClassName: "grow-font-size",
+        // progressClassName: "fancy-progress-bar"
       }
     );
 
@@ -333,8 +334,20 @@ class App extends Component {
       return (
         <tr key={reservation.reservation_id}>
           <td>{reservation.reservation_id}</td>
-          <td>{reservation.start_date}</td>
-          <td>{reservation.end_date}</td>
+          <td>
+            {new Intl.DateTimeFormat("en-GB", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit"
+            }).format(reservation.start_date)}
+          </td>
+          <td>
+            {new Intl.DateTimeFormat("en-GB", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit"
+            }).format(reservation.end_date)}
+          </td>
           <td>{reservation.resource_id}</td>
           <td>{reservation.owner_email}</td>
           <td>{reservation.comments}</td>
@@ -476,9 +489,6 @@ class App extends Component {
 
           <tbody>{resources}</tbody>
         </Table>
-        /*
-        REZEEEEEEEEEEEEEEEEEEERRRRRRRRRRRRRVAAAAAAAAAAAAAAAAAAAAAAAAAARIIIIIIIIIIIIIIII
-        */ <br></br>
         <Button
           className="my-3"
           color="primary"
