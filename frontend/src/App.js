@@ -12,8 +12,12 @@ import {
   Form
 } from "reactstrap";
 import { toast } from "react-toastify";
+import DatePicker from "react-datepicker";
 import axios from "axios";
+import "react-datepicker/dist/react-datepicker.css";
 import "react-toastify/dist/ReactToastify.css";
+
+//import "react-datepicker/dist/react-datepicker-cssmodules.css";
 toast.configure({ autoClose: 4000, draggable: true });
 
 class App extends Component {
@@ -506,32 +510,52 @@ class App extends Component {
               Add a new Reservation
             </ModalHeader>
             <ModalBody>
-              <Label for="start_date">Start Date</Label>
-              <Input
-                id="start_date"
-                value={this.state.newReservationData.start_date}
-                onChange={e => {
-                  let { newReservationData } = this.state;
+              <Table>
+                <tbody>
+                  <tr>
+                    <td>
+                      <Label for="start_date">Start Date</Label>
+                      <DatePicker
+                        selected={this.state.newReservationData.start_date}
+                        onChange={e => {
+                          let { newReservationData } = this.state;
+                          // console.log(e);
+                          //console.log(new Date(e).getTime());
+                          newReservationData.start_date = new Date(e).getTime();
 
-                  newReservationData.start_date = e.target.value;
+                          this.setState({ newReservationData });
+                        }}
+                        //showTimeSelect
+                        timeFormat="HH:mm"
+                        timeIntervals={15}
+                        timeCaption="time"
+                        dateFormat="MMMM d, yyyy"
+                        //dateFormat="MMMM d, yyyy h:mm aa"
+                      />
+                    </td>
 
-                  this.setState({ newReservationData });
-                }}
-                placeholder="insert start date here"
-              />
-              <Label for="start_date">End Date</Label>
-              <Input
-                id="end_date"
-                value={this.state.newReservationData.end_date}
-                onChange={e => {
-                  let { newReservationData } = this.state;
+                    <td>
+                      <Label for="end_date">End Date</Label>
+                      <DatePicker
+                        selected={this.state.newReservationData.end_date}
+                        onChange={e => {
+                          let { newReservationData } = this.state;
+                          // console.log(e);
+                          //console.log(new Date(e).getTime());
+                          newReservationData.end_date = new Date(e).getTime();
 
-                  newReservationData.end_date = e.target.value;
-
-                  this.setState({ newReservationData });
-                }}
-                placeholder="insert end date here"
-              />
+                          this.setState({ newReservationData });
+                        }}
+                        //showTimeSelect
+                        timeFormat="HH:mm"
+                        timeIntervals={15}
+                        timeCaption="time"
+                        dateFormat="MMMM d, yyyy"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
               <Label for="resource_id">Resource id</Label>
               <Input
                 id="resource_id"
@@ -602,30 +626,54 @@ class App extends Component {
               Edit Reservation
             </ModalHeader>
             <ModalBody>
-              <Label for="start_date">Start Date</Label>
-              <Input
-                id="start_date"
-                value={this.state.editReservationData.start_date}
-                onChange={e => {
-                  let { editReservationData } = this.state;
+              <Table>
+                <tbody>
+                  <tr>
+                    <td>
+                      <Label for="start_date">Start Date</Label>
+                      <DatePicker
+                        selected={this.state.editReservationData.start_date}
+                        onChange={e => {
+                          let { editReservationData } = this.state;
+                          // console.log(e);
+                          //console.log(new Date(e).getTime());
+                          editReservationData.start_date = new Date(
+                            e
+                          ).getTime();
 
-                  editReservationData.start_date = e.target.value;
+                          this.setState({ editReservationData });
+                        }}
+                        //showTimeSelect
+                        timeFormat="HH:mm"
+                        timeIntervals={15}
+                        timeCaption="time"
+                        dateFormat="MMMM d, yyyy"
+                        //dateFormat="MMMM d, yyyy h:mm aa"
+                      />
+                    </td>
 
-                  this.setState({ editReservationData });
-                }}
-              />
-              <Label for="end_date">End Date</Label>
-              <Input
-                id="end_date"
-                value={this.state.editReservationData.end_date}
-                onChange={e => {
-                  let { editReservationData } = this.state;
+                    <td>
+                      <Label for="end_date">End Date</Label>
+                      <DatePicker
+                        selected={this.state.editReservationData.end_date}
+                        onChange={e => {
+                          let { editReservationData } = this.state;
+                          // console.log(e);
+                          //console.log(new Date(e).getTime());
+                          editReservationData.end_date = new Date(e).getTime();
 
-                  editReservationData.end_date = e.target.value;
-
-                  this.setState({ editReservationData });
-                }}
-              />
+                          this.setState({ editReservationData });
+                        }}
+                        //showTimeSelect
+                        timeFormat="HH:mm"
+                        timeIntervals={15}
+                        timeCaption="time"
+                        dateFormat="MMMM d, yyyy"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
               <Label for="resource_id">Resource id</Label>
               <Input
                 id="resource_id"
