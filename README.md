@@ -2,6 +2,10 @@
 
 A reservation system for the sales division
 
+How to use:
+Interface - https://youtu.be/94P6i_BnglU
+Mobile responsive - https://youtu.be/oM8bivCSyN0
+
 Tutorials used:
 
 - https://www.techiediaries.com/node-sqlite-crud/
