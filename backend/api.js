@@ -1,28 +1,39 @@
+// Imports
 const Database = require("sqlite-async");
 const express = require("express");
 const cors = require("cors");
 const app = express();
+
+// Without cors activated you can't make request from one server to another
+// i.e. from frontend (localhost:3000) to backend (localhost:8080)
 app.use(cors());
-let db;
 
 // Server port
 const HTTP_PORT = 8080;
 
-// Regex email
+// Connection to the database
+let db;
+
+// Regex email (for testing if an email is valid)
 const validateEmail = email =>
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
     String(email).toLowerCase()
   );
 
 const main = (async () => {
+  // Starting the database
   try {
     db = await Database.open(":memory:");
+
+    // Database could also be started from a file, in which case
+    // the data is persisted if the server fails
     // db = await Database.open("./mydb.sqlite3");
   } catch (e) {
     throw Error("can not access sqlite database");
   }
 
   try {
+    // Pretty self-explanatory, creating tables and inserting test data
     await createTables();
 
     await insertResource("First resouce name");
@@ -63,6 +74,8 @@ const main = (async () => {
 
     await printReservations();
 
+    // After the database is started and test data is persisted (notice the await's)
+    // the express server (api) is started for ansering GET/POST/PATCH/DELETE requests
     startExpressServer();
   } catch (e) {
     console.error(e);
@@ -136,13 +149,9 @@ const startExpressServer = () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
-  // Start server
+  // Start server on given port
   app.listen(HTTP_PORT, () => {
     console.log("Server running on port " + HTTP_PORT);
-  });
-  // Root endpoint
-  app.get("/test", (req, res, next) => {
-    res.json({ message: "Ok" });
   });
 
   // Insert here other API endpoints
