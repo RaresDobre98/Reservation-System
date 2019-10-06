@@ -3,16 +3,16 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 app.use(cors());
+let db;
 
 // Server port
-const HTTP_PORT = 8000;
+const HTTP_PORT = 8080;
 
 // Regex email
 const validateEmail = email =>
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
     String(email).toLowerCase()
   );
-let db;
 
 const main = (async () => {
   try {

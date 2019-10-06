@@ -56,13 +56,7 @@ class App extends Component {
 
   notify = () =>
     toast.error(
-      "This resource cannot be deleted, there are still some reservations made!",
-      {
-        // position: toast.POSITION.BOTTOM_CENTER,
-        // className: "black-background",
-        // bodyClassName: "grow-font-size",
-        // progressClassName: "fancy-progress-bar"
-      }
+      "This resource cannot be deleted, there are still some reservations made!"
     );
 
   UNSAFE_componentWillMount() {
@@ -107,7 +101,7 @@ class App extends Component {
     e.preventDefault();
     axios
       .post(
-        "http://localhost:8000/api/reservation",
+        "http://localhost:8080/api/reservation",
         this.state.newReservationData
       )
       .then(res => {
@@ -137,7 +131,7 @@ class App extends Component {
   addResource(e) {
     e.preventDefault();
     axios
-      .post("http://localhost:8000/api/resource", this.state.newResourceData)
+      .post("http://localhost:8080/api/resource", this.state.newResourceData)
       .then(res => {
         //console.log(res.data);
         let { resources } = this.state;
@@ -160,7 +154,7 @@ class App extends Component {
 
   deleteReservation(reservation_id) {
     axios
-      .delete("http://localhost:8000/api/reservation/" + reservation_id)
+      .delete("http://localhost:8080/api/reservation/" + reservation_id)
       .then(() => this._refreshResources())
       .catch(() => {
         //this.notify();
@@ -169,7 +163,7 @@ class App extends Component {
 
   deleteResource(resource_id) {
     axios
-      .delete("http://localhost:8000/api/resource/" + resource_id)
+      .delete("http://localhost:8080/api/resource/" + resource_id)
       .then(() => this._refreshResources())
       .catch(() => {
         this.notify();
@@ -231,7 +225,7 @@ class App extends Component {
       comments
     } = this.state.editReservationData;
     axios
-      .patch("http://localhost:8000/api/reservation/" + reservation_id, {
+      .patch("http://localhost:8080/api/reservation/" + reservation_id, {
         start_date,
         end_date,
         resource_id,
@@ -269,7 +263,7 @@ class App extends Component {
     console.log(this.state.editResourceData);
     let { resource_id, resource_name } = this.state.editResourceData;
     axios
-      .patch("http://localhost:8000/api/resource/" + resource_id, {
+      .patch("http://localhost:8080/api/resource/" + resource_id, {
         resource_name
       })
       .then(res => {
@@ -291,12 +285,12 @@ class App extends Component {
   }
 
   _refreshResources() {
-    axios.get("http://localhost:8000/api/resources").then(res => {
+    axios.get("http://localhost:8080/api/resources").then(res => {
       this.setState({
         resources: res.data.data
       });
     });
-    axios.get("http://localhost:8000/api/reservations").then(res => {
+    axios.get("http://localhost:8080/api/reservations").then(res => {
       this.setState({
         reservations: res.data.data
       });
@@ -342,14 +336,18 @@ class App extends Component {
             {new Intl.DateTimeFormat("en-GB", {
               year: "2-digit",
               month: "2-digit",
-              day: "2-digit"
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit"
             }).format(reservation.start_date)}
           </td>
           <td>
             {new Intl.DateTimeFormat("en-GB", {
               year: "2-digit",
               month: "2-digit",
-              day: "2-digit"
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit"
             }).format(reservation.end_date)}
           </td>
           <td>{reservation.resource_id}</td>
@@ -525,11 +523,11 @@ class App extends Component {
 
                           this.setState({ newReservationData });
                         }}
-                        //showTimeSelect
+                        showTimeSelect
                         timeFormat="HH:mm"
                         timeIntervals={15}
                         timeCaption="time"
-                        dateFormat="MMMM d, yyyy"
+                        dateFormat="MMMM d, yyyy HH:mm"
                         //dateFormat="MMMM d, yyyy h:mm aa"
                       />
                     </td>
@@ -546,11 +544,11 @@ class App extends Component {
 
                           this.setState({ newReservationData });
                         }}
-                        //showTimeSelect
+                        showTimeSelect
                         timeFormat="HH:mm"
                         timeIntervals={15}
                         timeCaption="time"
-                        dateFormat="MMMM d, yyyy"
+                        dateFormat="MMMM d, yyyy HH:mm"
                       />
                     </td>
                   </tr>
@@ -643,12 +641,12 @@ class App extends Component {
 
                           this.setState({ editReservationData });
                         }}
-                        //showTimeSelect
+                        showTimeSelect
                         timeFormat="HH:mm"
                         timeIntervals={15}
                         timeCaption="time"
-                        dateFormat="MMMM d, yyyy"
-                        //dateFormat="MMMM d, yyyy h:mm aa"
+                        //dateFormat="MMMM d, yyyy"
+                        dateFormat="MMMM d, yyyy HH:mm"
                       />
                     </td>
 
@@ -664,11 +662,11 @@ class App extends Component {
 
                           this.setState({ editReservationData });
                         }}
-                        //showTimeSelect
+                        showTimeSelect
                         timeFormat="HH:mm"
                         timeIntervals={15}
                         timeCaption="time"
-                        dateFormat="MMMM d, yyyy"
+                        dateFormat="MMMM d, yyyy HH:mm"
                       />
                     </td>
                   </tr>
