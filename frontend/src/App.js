@@ -1,3 +1,4 @@
+// Required imports
 import React, { Component } from "react";
 import {
   Alert,
@@ -17,10 +18,14 @@ import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-toastify/dist/ReactToastify.css";
 
-//import "react-datepicker/dist/react-datepicker-cssmodules.css";
+// Toast is used for the top right error notification
 toast.configure({ autoClose: 4000, draggable: true });
 
 class App extends Component {
+  // state is used by react to store all the informations for our application,
+  // for example, if we add another resource we can update the resources
+  // vector using setState which trigger a rerender of the html so we can
+  // have a live feedback and see the resource added
   state = {
     resources: [],
     newResourceData: {
@@ -59,6 +64,8 @@ class App extends Component {
       "This resource cannot be deleted, there are still some reservations made!"
     );
 
+  // Before our site(component) is rendered it will be nice to have
+  // the data so we can display it :)
   UNSAFE_componentWillMount() {
     this._refreshResources();
   }
@@ -97,6 +104,11 @@ class App extends Component {
     });
   }
 
+  // Making a post request to the backend if any error happened then
+  // the errorMessageModal is set to true in order to be shown up
+  // else we push the new reservation to the existing vector of
+  // reservations to have a live refresh and we set the modal
+  // field to empty in order to add another reservation
   addReservation(e) {
     e.preventDefault();
     axios
@@ -128,12 +140,12 @@ class App extends Component {
       );
   }
 
+  // Same as addReservation
   addResource(e) {
     e.preventDefault();
     axios
       .post("http://localhost:8080/api/resource", this.state.newResourceData)
       .then(res => {
-        //console.log(res.data);
         let { resources } = this.state;
         resources.push({ ...res.data.data, resource_id: res.data.id });
         this.setState({
@@ -152,15 +164,15 @@ class App extends Component {
       );
   }
 
+  // We shouldn't have any error here but the server connection lost
   deleteReservation(reservation_id) {
     axios
       .delete("http://localhost:8080/api/reservation/" + reservation_id)
       .then(() => this._refreshResources())
-      .catch(() => {
-        //this.notify();
-      });
+      .catch(err => console.log(err));
   }
 
+  // If any error happen it's because the resource still have some reservations in the databse
   deleteResource(resource_id) {
     axios
       .delete("http://localhost:8080/api/resource/" + resource_id)
@@ -170,6 +182,8 @@ class App extends Component {
       });
   }
 
+  // When we click the editReservation button then we must also set the field
+  // of the modal to the corresponding values and also show the modal window
   editReservation(
     reservation_id,
     start_date,
@@ -178,16 +192,6 @@ class App extends Component {
     owner_email,
     comments
   ) {
-    //console.log(resource_id, resource_name);
-    console.log(
-      "DA: " +
-        reservation_id +
-        start_date +
-        end_date +
-        resource_id +
-        owner_email +
-        comments
-    );
     this.setState({
       editReservationData: {
         reservation_id,
@@ -201,8 +205,8 @@ class App extends Component {
     this.toggleEditReservationModal();
   }
 
+  // Same as editReservation
   editResource(resource_id, resource_name) {
-    //console.log(resource_id, resource_name);
     this.setState({
       editResourceData: {
         resource_id,
@@ -212,10 +216,10 @@ class App extends Component {
     this.toggleEditResourceModal();
   }
 
+  // When clicking the Update Reservation buttton it send a PATCH request
+  // to the backend with corresponding values from the modal
   updateReservation(e) {
-    // console.log("here");
     e.preventDefault();
-    console.log("HERE" + this.state.editReservationData);
     let {
       reservation_id,
       start_date,
@@ -233,7 +237,6 @@ class App extends Component {
         comments
       })
       .then(res => {
-        console.log(res);
         this._refreshResources();
 
         this.setState({
@@ -249,7 +252,6 @@ class App extends Component {
         });
       })
       .catch(err => {
-        console.log(err);
         this.setState({
           errorMessage: err.response.data.error,
           errorMessageModal: true
@@ -257,17 +259,15 @@ class App extends Component {
       });
   }
 
+  // Same as the updateReservation
   updateResource(e) {
-    // console.log("here");
     e.preventDefault();
-    console.log(this.state.editResourceData);
     let { resource_id, resource_name } = this.state.editResourceData;
     axios
       .patch("http://localhost:8080/api/resource/" + resource_id, {
         resource_name
       })
       .then(res => {
-        console.log(res);
         this._refreshResources();
 
         this.setState({
@@ -276,7 +276,6 @@ class App extends Component {
         });
       })
       .catch(err => {
-        console.log(err);
         this.setState({
           errorMessage: err.response.data.error,
           errorMessageModal: true
@@ -284,6 +283,7 @@ class App extends Component {
       });
   }
 
+  // Getting all data from the backend
   _refreshResources() {
     axios.get("http://localhost:8080/api/resources").then(res => {
       this.setState({
@@ -298,6 +298,7 @@ class App extends Component {
   }
 
   render() {
+    // Generating the HTML code for the resources
     let resources = this.state.resources.map(resource => {
       return (
         <tr key={resource.resource_id}>
@@ -328,6 +329,7 @@ class App extends Component {
       );
     });
 
+    // Generating the HTML code for the reservations
     let reservations = this.state.reservations.map(reservation => {
       return (
         <tr key={reservation.reservation_id}>
@@ -517,8 +519,7 @@ class App extends Component {
                         selected={this.state.newReservationData.start_date}
                         onChange={e => {
                           let { newReservationData } = this.state;
-                          // console.log(e);
-                          //console.log(new Date(e).getTime());
+
                           newReservationData.start_date = new Date(e).getTime();
 
                           this.setState({ newReservationData });
@@ -528,7 +529,6 @@ class App extends Component {
                         timeIntervals={15}
                         timeCaption="time"
                         dateFormat="MMMM d, yyyy HH:mm"
-                        //dateFormat="MMMM d, yyyy h:mm aa"
                       />
                     </td>
 
@@ -538,8 +538,7 @@ class App extends Component {
                         selected={this.state.newReservationData.end_date}
                         onChange={e => {
                           let { newReservationData } = this.state;
-                          // console.log(e);
-                          //console.log(new Date(e).getTime());
+
                           newReservationData.end_date = new Date(e).getTime();
 
                           this.setState({ newReservationData });
@@ -633,8 +632,7 @@ class App extends Component {
                         selected={this.state.editReservationData.start_date}
                         onChange={e => {
                           let { editReservationData } = this.state;
-                          // console.log(e);
-                          //console.log(new Date(e).getTime());
+
                           editReservationData.start_date = new Date(
                             e
                           ).getTime();
@@ -645,7 +643,6 @@ class App extends Component {
                         timeFormat="HH:mm"
                         timeIntervals={15}
                         timeCaption="time"
-                        //dateFormat="MMMM d, yyyy"
                         dateFormat="MMMM d, yyyy HH:mm"
                       />
                     </td>
@@ -656,8 +653,7 @@ class App extends Component {
                         selected={this.state.editReservationData.end_date}
                         onChange={e => {
                           let { editReservationData } = this.state;
-                          // console.log(e);
-                          //console.log(new Date(e).getTime());
+
                           editReservationData.end_date = new Date(e).getTime();
 
                           this.setState({ editReservationData });
